@@ -29,6 +29,25 @@ The `encoder` argument is intentionally model-agnostic: pass any object with an
 `overall_score` is a heuristic aggregate quality score in `[0, 1]` (higher is better),
 derived from alignment costs and penalizing insertion/deletion blocks.
 
+### Run tests and inspect English/French alignment output
+
+A small test suite for the new in-memory API lives under `tests/`.
+
+```bash
+python -m pip install -e .
+python -m pytest -q
+```
+
+To quickly see alignment output on two in-memory lists (English vs French), run:
+
+```bash
+python examples/english_french_demo.py
+```
+
+This prints per-block alignments and an overall quality score in `[0, 1]`.
+For production quality embeddings, pass your own encoder model (e.g. LASER or
+SentenceTransformers) to `sentalign(...)`.
+
 Vecalign is an accurate sentence alignment algorithm which is fast even for very long documents.
 In conjunction with [LASER](https://github.com/facebookresearch/LASER), Vecalign 
 works in about 100 languages (i.e. 100^2 language pairs), 

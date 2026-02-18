@@ -1,6 +1,7 @@
 import hashlib
 
 import numpy as np
+import pytest
 
 from sentalign import SentAlignResult, sentalign
 
@@ -135,3 +136,37 @@ def test_sentalign_long_sentences_many_to_one_merge():
 
     assert any(block.src_indices == [0, 1] and block.tgt_indices == [0] for block in result.alignments)
     assert any(block.src_indices == [2] and block.tgt_indices == [1] for block in result.alignments)
+
+
+def test_sentalign_with_sentence_transformers_encoder():
+    sentence_transformers = pytest.importorskip(
+        "sentence_transformers", reason="Install sentence-transformers to run real-encoder integration test"
+    )
+
+    src = [
+        "The committee approved the revised policy after a long debate.",
+        "Implementation will begin next quarter with a pilot team.",
+        "A public report will summarize outcomes at the end of the year.",
+    ]
+    tgt = [
+        "Le comité a approuvé la politique révisée après un long débat.",
+        "La mise en œuvre commencera le trimestre prochain avec une équipe pilote.",
+        "Un rapport public résumera les résultats à la fin de l'année.",
+    ]
+
+    try:
+        model = sentence_transformers.SentenceTransformer(
+            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+        )
+    except Exception as exc:
+        pytest.skip(f"Could not load/download sentence-transformers model: {exc}")
+
+    result = sentalign(src, tgt, encoder=model, alignment_max_size=6)
+
+    aligned_pairs = [
+        (block.src_indices, block.tgt_indices)
+        for block in result.alignments
+        if block.src_indices and block.tgt_indices
+    ]
+    assert aligned_pairs == [([0], [0]), ([1], [1]), ([2], [2])]
+    assert result.overall_score > 0.40

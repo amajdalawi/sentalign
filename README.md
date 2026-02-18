@@ -34,8 +34,12 @@ derived from alignment costs and penalizing insertion/deletion blocks.
 A small test suite for the new in-memory API lives under `tests/`.
 
 ```bash
-python -m pip install -e .
+python -m pip install -e .[test]
 python -m pytest -q
+
+# Optional: run integration test with a real multilingual encoder
+python -m pip install -e .[test-real]
+python -m pytest -q -k sentence_transformers
 ```
 
 To quickly see alignment output on two in-memory lists (English vs French), run:

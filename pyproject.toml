@@ -21,6 +21,10 @@ dependencies = [
 test = [
   "pytest>=7"
 ]
+test-real = [
+  "pytest>=7",
+  "sentence-transformers>=2.2"
+]
 
 [tool.setuptools]
 py-modules = [

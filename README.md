@@ -44,6 +44,13 @@ To quickly see alignment output on two in-memory lists (English vs French), run:
 python examples/english_french_demo.py
 ```
 
+For a more complex French→English example with intentional sentence splits/merges
+(N:M alignment blocks), run:
+
+```bash
+python examples/complex_french_english_demo.py
+```
+
 This prints per-block alignments and an overall quality score in `[0, 1]`.
 For production quality embeddings, pass your own encoder model (e.g. LASER or
 SentenceTransformers) to `sentalign(...)`.

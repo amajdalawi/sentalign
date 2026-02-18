@@ -65,3 +65,19 @@ def test_sentalign_supports_one_to_many_mode():
 
     assert len(result.alignments) > 0
     assert any(len(block.tgt_indices) > 1 for block in result.alignments)
+
+
+def test_sentalign_can_produce_many_to_one_blocks():
+    src = [
+        "the train is delayed",
+        "because of heavy rain",
+        "then we took a taxi",
+    ]
+    tgt = [
+        "the train is delayed because of heavy rain",
+        "then we took a taxi",
+    ]
+
+    result = sentalign(src, tgt, encoder=HashEncoder(), alignment_max_size=6)
+
+    assert any(block.src_indices == [0, 1] and block.tgt_indices == [0] for block in result.alignments)

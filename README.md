@@ -1,5 +1,34 @@
 # Vecalign
 
+## New: Python library API (`sentalign`)
+
+This repository now supports installation as a Python package and an in-memory API:
+
+```bash
+pip install .
+```
+
+```python
+from sentence_transformers import SentenceTransformer
+from sentalign import sentalign
+
+model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+
+src = ["Hallo Welt.", "Wie geht es dir?"]
+tgt = ["Hello world.", "How are you?"]
+
+result = sentalign(src, tgt, encoder=model)
+print(result.overall_score)
+for block in result.alignments:
+    print(block.src_indices, block.tgt_indices, block.score)
+```
+
+The `encoder` argument is intentionally model-agnostic: pass any object with an
+`encode(list[str]) -> 2D array` method (or a callable with the same behavior).
+
+`overall_score` is a heuristic aggregate quality score in `[0, 1]` (higher is better),
+derived from alignment costs and penalizing insertion/deletion blocks.
+
 Vecalign is an accurate sentence alignment algorithm which is fast even for very long documents.
 In conjunction with [LASER](https://github.com/facebookresearch/LASER), Vecalign 
 works in about 100 languages (i.e. 100^2 language pairs), 

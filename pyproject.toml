@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "numpy", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentalign"
+version = "0.1.0"
+description = "In-memory sentence alignment with Vecalign dynamic programming"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Brian Thompson"}
+]
+dependencies = [
+  "numpy",
+  "cython"
+]
+
+[tool.setuptools]
+py-modules = [
+  "sentalign",
+  "vecalign",
+  "overlap",
+  "score",
+  "dp_utils",
+  "standalone_document_embedding_demo"
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.pyx"]

@@ -42,6 +42,30 @@ python -m pip install -e .[test-real]
 python -m pytest -q -k sentence_transformers
 ```
 
+If you want to force GPU usage and verify it explicitly during tests, you can run:
+
+```bash
+python - <<'PY'
+import torch
+from sentence_transformers import SentenceTransformer
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Chosen device:", device)
+if device == "cuda":
+    print("GPU name:", torch.cuda.get_device_name(0))
+
+model = SentenceTransformer(
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    device=device,
+)
+print("Model device:", next(model._first_module().auto_model.parameters()).device)
+PY
+
+python -m pytest -q -k sentence_transformers
+```
+
+Tip: run `nvidia-smi -l 1` in another terminal while the test runs to confirm GPU utilization.
+
 To quickly see alignment output on two in-memory lists (English vs French), run:
 
 ```bash

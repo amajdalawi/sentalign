@@ -146,6 +146,7 @@ def test_sentalign_long_sentences_many_to_one_merge():
 
 
 def test_sentalign_with_sentence_transformers_encoder():
+    torch = pytest.importorskip("torch", reason="Install torch to run real-encoder integration test")
     sentence_transformers = pytest.importorskip(
         "sentence_transformers", reason="Install sentence-transformers to run real-encoder integration test"
     )
@@ -161,12 +162,25 @@ def test_sentalign_with_sentence_transformers_encoder():
         "Un rapport public résumera les résultats à la fin de l'année.",
     ]
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"[sentalign test] chosen device: {device}")
+    if device == "cuda":
+        print(f"[sentalign test] gpu: {torch.cuda.get_device_name(0)}")
+
     try:
         model = sentence_transformers.SentenceTransformer(
-            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            device=device,
         )
     except Exception as exc:
         pytest.skip(f"Could not load/download sentence-transformers model: {exc}")
+
+    model_device = str(next(model._first_module().auto_model.parameters()).device)
+    print(f"[sentalign test] model device: {model_device}")
+    if device == "cuda":
+        assert model_device.startswith("cuda")
+    else:
+        assert model_device.startswith("cpu")
 
     result = sentalign(src, tgt, encoder=model, alignment_max_size=6)
 

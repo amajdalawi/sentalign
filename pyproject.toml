@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sentalign"
-version = "0.1.0"
+version = "0.1.1"
 description = "In-memory sentence alignment with Vecalign dynamic programming"
 readme = "README.md"
 requires-python = ">=3.8"

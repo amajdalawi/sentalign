@@ -95,7 +95,7 @@ def sentalign(
     tgt_sentences: Sequence[str],
     encoder: EncoderType,
     *,
-    alignment_max_size: int = 4,
+    alignment_max_size: int = 8,
     one_to_many: Optional[int] = None,
     del_percentile_frac: float = 0.2,
     max_size_full_dp: int = 300,

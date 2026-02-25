@@ -191,3 +191,16 @@ def test_sentalign_with_sentence_transformers_encoder():
     ]
     assert aligned_pairs == [([0], [0]), ([1], [1]), ([2], [2])]
     assert result.overall_score > 0.40
+
+
+def test_pytest_can_output_alignment_result_to_stdout(capsys):
+    src = ["Hello everyone.", "We are testing stdout."]
+    tgt = ["Bonjour à tous.", "Nous testons la sortie standard."]
+
+    result = sentalign(src, tgt, encoder=HashEncoder())
+    print(f"overall_score={result.overall_score:.4f}")
+    print(f"blocks={len(result.alignments)}")
+
+    captured = capsys.readouterr()
+    assert "overall_score=" in captured.out
+    assert "blocks=" in captured.out

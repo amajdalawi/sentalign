@@ -12,4 +12,5 @@ sentalign.egg-info/SOURCES.txt
 sentalign.egg-info/dependency_links.txt
 sentalign.egg-info/requires.txt
 sentalign.egg-info/top_level.txt
+tests/test_custom.py
 tests/test_sentalign.py

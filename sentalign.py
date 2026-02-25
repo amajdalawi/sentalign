@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from math import ceil
 from random import seed as random_seed
 from typing import Callable, Iterable, List, Optional, Protocol, Sequence, Union
-
+from pathlib import Path
 import numpy as np
 
 from dp_utils import (
@@ -28,6 +28,8 @@ class EncoderProtocol(Protocol):
 
 EncoderType = Union[Callable[[Sequence[str]], Union[np.ndarray, Sequence[Sequence[float]]]], EncoderProtocol]
 
+en_example_lines = Path(__file__).parent / "tests" / "en_texts.txt"
+nl_example_lines = Path(__file__).parent / "tests" / "nl_texts.txt"
 
 @dataclass(frozen=True)
 class SentenceAlignment:

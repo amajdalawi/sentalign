@@ -4,6 +4,12 @@ import numpy as np
 import pytest
 
 from sentalign import SentAlignResult, sentalign
+import torch
+from sentence_transformers import SentenceTransformer
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Chosen device:", device)
+if device == "cuda":
+    print("GPU name:", torch.cuda.get_device_name(0))
 
 
 class HashEncoder:
@@ -150,6 +156,9 @@ def test_sentalign_with_sentence_transformers_encoder():
     sentence_transformers = pytest.importorskip(
         "sentence_transformers", reason="Install sentence-transformers to run real-encoder integration test"
     )
+    sentence_transformer_cls = getattr(sentence_transformers, "SentenceTransformer", None)
+    if sentence_transformer_cls is None:
+        pytest.skip("sentence_transformers import succeeded but SentenceTransformer class is unavailable")
 
     src = [
         "The committee approved the revised policy after a long debate.",
@@ -168,10 +177,20 @@ def test_sentalign_with_sentence_transformers_encoder():
         print(f"[sentalign test] gpu: {torch.cuda.get_device_name(0)}")
 
     try:
+        model = sentence_transformer_cls(
+            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            device=device,
+        )
+        print(f"[sentalign test] model device: {next(model._first_module().auto_model.parameters()).device}")
+        # model = SentenceTransformer(
+        #     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        #     device=device
         model = sentence_transformers.SentenceTransformer(
             "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
             device=device,
         )
+        print("Model device:", next(model._first_module().auto_model.parameters()).device)
+# >>>>>>> Stashed changes
     except Exception as exc:
         pytest.skip(f"Could not load/download sentence-transformers model: {exc}")
 

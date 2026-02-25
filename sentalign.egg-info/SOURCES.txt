@@ -1,0 +1,15 @@
+LICENSE
+README.md
+dp_utils.py
+overlap.py
+pyproject.toml
+score.py
+sentalign.py
+standalone_document_embedding_demo.py
+vecalign.py
+sentalign.egg-info/PKG-INFO
+sentalign.egg-info/SOURCES.txt
+sentalign.egg-info/dependency_links.txt
+sentalign.egg-info/requires.txt
+sentalign.egg-info/top_level.txt
+tests/test_sentalign.py

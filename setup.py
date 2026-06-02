@@ -4,10 +4,10 @@ import numpy as np
 
 extensions = [
     Extension(
-    "sentalign.dp_core",
-    sources=["src/sentalign/dp_core.pyx"],
-    include_dirs=[np.get_include()],
-)
+        "sentalign.dp_core",
+        sources=["src/sentalign/dp_core.pyx"],
+        include_dirs=[np.get_include()],
+    )
 ]
 
 setup(

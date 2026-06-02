@@ -9,7 +9,7 @@ from typing import Callable, Iterable, List, Optional, Protocol, Sequence, Union
 from pathlib import Path
 import numpy as np
 
-from dp_utils import (
+from .dp_utils import (
     layer,
     make_alignment_types,
     make_norm1,

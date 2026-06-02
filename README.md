@@ -1,85 +1,119 @@
-# Vecalign
+# sentalign
 
-## New: Python library API (`sentalign`)
+`sentalign` is a small Python package for aligning sentences between two languages using multilingual sentence embeddings and VecAlign-style dynamic programming.
 
-This repository now supports installation as a Python package and an in-memory API:
+It works fully in memory: pass two lists of sentences, get back aligned sentence blocks.
+
+## Installation
 
 ```bash
-pip install .
+pip install sentalign
 ```
+
+For real multilingual alignment, you also need an embedding model. For example:
+
+```bash
+pip install sentence-transformers
+```
+
+## Basic usage
 
 ```python
 from sentence_transformers import SentenceTransformer
 from sentalign import sentalign
 
-model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+src = [
+    "Hello world.",
+    "My name is Abdulrahman.",
+    "I like machine learning.",
+]
 
-src = ["Hallo Welt.", "Wie geht es dir?"]
-tgt = ["Hello world.", "How are you?"]
+tgt = [
+    "Bonjour le monde.",
+    "Je m'appelle Abdulrahman.",
+    "J'aime l'apprentissage automatique.",
+]
 
-result = sentalign(src, tgt, encoder=model)
-print(result.overall_score)
-for block in result.alignments:
-    print(block.src_indices, block.tgt_indices, block.score)
-```
-
-The `encoder` argument is intentionally model-agnostic: pass any object with an
-`encode(list[str]) -> 2D array` method (or a callable with the same behavior).
-
-`overall_score` is a heuristic aggregate quality score in `[0, 1]` (higher is better),
-derived from alignment costs and penalizing insertion/deletion blocks.
-
-### Run tests and inspect English/French alignment output
-
-A small test suite for the new in-memory API lives under `tests/`.
-
-```bash
-python -m pip install -e .[test]
-python -m pytest -q
-
-# Optional: run integration test with a real multilingual encoder
-python -m pip install -e .[test-real]
-python -m pytest -q -k sentence_transformers
-```
-
-If you want to force GPU usage and verify it explicitly during tests, you can run:
-
-```bash
-python - <<'PY'
-import torch
-from sentence_transformers import SentenceTransformer
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print("Chosen device:", device)
-if device == "cuda":
-    print("GPU name:", torch.cuda.get_device_name(0))
-
-model = SentenceTransformer(
-    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-    device=device,
+encoder = SentenceTransformer(
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
-print("Model device:", next(model._first_module().auto_model.parameters()).device)
-PY
 
-python -m pytest -q -k sentence_transformers
+result = sentalign(
+    src,
+    tgt,
+    encoder=encoder,
+)
+
+print("Overall score:", result.overall_score)
+
+for alignment in result.alignments:
+    print(alignment.src_indices, alignment.tgt_indices)
+    print(alignment.src_sentences)
+    print(alignment.tgt_sentences)
+    print("score:", alignment.score)
+    print()
 ```
 
-Tip: run `nvidia-smi -l 1` in another terminal while the test runs to confirm GPU utilization.
+## Important: use a multilingual encoder
 
-To quickly see alignment output on two in-memory lists (English vs French), run:
+`sentalign` does not create embeddings by itself. You must pass an encoder.
+
+For cross-language alignment, use a multilingual encoder such as:
+
+```python
+SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+```
+
+or a model like LaBSE.
+
+Do not use a monolingual English-only model for English/French, English/Arabic, Hebrew/English, etc. The encoder must place sentences from both languages in the same embedding space.
+
+## API
+
+```python
+sentalign(src_sentences, tgt_sentences, encoder)
+```
+
+Returns a `SentAlignResult`:
+
+```python
+result.alignments
+result.overall_score
+result.average_alignment_score
+```
+
+Each alignment block contains:
+
+```python
+alignment.src_indices
+alignment.tgt_indices
+alignment.score
+alignment.src_sentences
+alignment.tgt_sentences
+```
+
+## Development
+
+Install locally in editable mode:
 
 ```bash
-python examples/english_french_demo.py
+pip install -e .
 ```
 
-For a more complex French→English example with intentional sentence splits/merges
-(N:M alignment blocks), run:
+Run a simple multilingual test:
 
 ```bash
-python examples/complex_french_english_demo.py
+pip install sentence-transformers
+python tests/test_multilingual.py
 ```
 
-This prints per-block alignments and an overall quality score in `[0, 1]`.
-For production quality embeddings, pass your own encoder model (e.g. LASER or
-SentenceTransformers) to `sentalign(...)`.
+Build the package:
 
+```bash
+python -m build
+twine check dist/*
+```
+
+## License
+
+Apache-2.0

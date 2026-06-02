@@ -1,1 +1,1 @@
-include dp_core.pyx
+recursive-include src/sentalign *.pyx

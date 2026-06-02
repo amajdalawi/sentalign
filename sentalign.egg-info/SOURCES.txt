@@ -1,10 +1,14 @@
 LICENSE
+MANIFEST.in
 README.md
+dp_core.c
+dp_core.pyx
 dp_utils.py
 overlap.py
 pyproject.toml
 score.py
 sentalign.py
+setup.py
 standalone_document_embedding_demo.py
 vecalign.py
 sentalign.egg-info/PKG-INFO

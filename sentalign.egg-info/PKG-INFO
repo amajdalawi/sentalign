@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: sentalign
-Version: 0.1.0
+Version: 0.1.1
 Summary: In-memory sentence alignment with Vecalign dynamic programming
 Author: Abdulrahman Almajdalawi
 License: 

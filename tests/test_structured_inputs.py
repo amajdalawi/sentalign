@@ -6,9 +6,9 @@ import importlib
 import numpy as np
 import pytest
 
-from sentalign import SentenceAlignment, sentalign
+from sentweave import SentenceAlignment, align
 
-sentalign_module = importlib.import_module("sentalign.sentalign")
+align_module = importlib.import_module("sentweave.align")
 
 
 class FakeEncoder:
@@ -65,7 +65,7 @@ def test_existing_strings_remain_supported():
     src = ("alpha",)
     tgt = ("alpha",)
 
-    result = sentalign(src, tgt, encoder=FakeEncoder())
+    result = align(src, tgt, encoder=FakeEncoder())
     alignment = first_alignment(result)
 
     assert alignment.src_indices == [0]
@@ -92,7 +92,7 @@ def test_dictionary_inputs_preserve_metadata():
     src_item = {"text": "alpha", "start": 12.4, "end": 14.1, "subtitle_id": 10}
     tgt_item = {"text": "alpha", "start": 12.5, "end": 14.0, "subtitle_id": 20}
 
-    result = sentalign([src_item], [tgt_item], encoder=FakeEncoder())
+    result = align([src_item], [tgt_item], encoder=FakeEncoder())
     alignment = first_alignment(result)
 
     assert alignment.src_sentences == ["alpha"]
@@ -107,7 +107,7 @@ def test_dataclass_inputs_use_text_attribute_and_preserve_identity():
     src_item = BookSentence("alpha", sentence_id=1, paragraph_id=2, chapter_id=3)
     tgt_item = BookSentence("alpha", sentence_id=8, paragraph_id=9, chapter_id=3)
 
-    result = sentalign([src_item], [tgt_item], encoder=FakeEncoder())
+    result = align([src_item], [tgt_item], encoder=FakeEncoder())
     alignment = first_alignment(result)
 
     assert alignment.src_sentences == ["alpha"]
@@ -122,7 +122,7 @@ def test_different_source_and_target_shapes_use_separate_extractors():
     src_item = SourceObject(text="ignored", content="alpha", item_id=1)
     tgt_item = TargetObject(subtitle="alpha", item_id=2)
 
-    result = sentalign(
+    result = align(
         [src_item],
         [tgt_item],
         encoder=FakeEncoder(),
@@ -141,7 +141,7 @@ def test_custom_getter_takes_precedence_over_text_attribute():
     src_item = SourceObject(text="beta", content="alpha", item_id=1)
     tgt_item = SourceObject(text="beta", content="alpha", item_id=2)
 
-    result = sentalign(
+    result = align(
         [src_item],
         [tgt_item],
         encoder=FakeEncoder(),
@@ -156,22 +156,22 @@ def test_custom_getter_takes_precedence_over_text_attribute():
 
 def test_missing_mapping_text_field_reports_side_and_index():
     with pytest.raises(ValueError, match=r"src_sentences\[1\].*'text' field"):
-        sentalign([{"text": "alpha"}, {"id": 2}], ["alpha"], encoder=FakeEncoder())
+        align([{"text": "alpha"}, {"id": 2}], ["alpha"], encoder=FakeEncoder())
 
 
 def test_missing_text_attribute_reports_side_and_index():
     with pytest.raises(ValueError, match=r"tgt_sentences\[0\].*\.text attribute"):
-        sentalign(["alpha"], [UnsupportedObject()], encoder=FakeEncoder())
+        align(["alpha"], [UnsupportedObject()], encoder=FakeEncoder())
 
 
 def test_non_string_mapping_text_is_rejected():
     with pytest.raises(TypeError, match=r"src_sentences\[0\] text must be str, got int"):
-        sentalign([{"text": 123}], ["alpha"], encoder=FakeEncoder())
+        align([{"text": 123}], ["alpha"], encoder=FakeEncoder())
 
 
 def test_non_string_custom_getter_result_is_rejected():
     with pytest.raises(TypeError, match=r"tgt_sentences\[0\] text must be str, got NoneType"):
-        sentalign(
+        align(
             ["alpha"],
             [TargetObject(subtitle="alpha", item_id=1)],
             encoder=FakeEncoder(),
@@ -181,7 +181,7 @@ def test_non_string_custom_getter_result_is_rejected():
 
 def test_custom_getter_extraction_error_is_wrapped_with_context():
     with pytest.raises(ValueError, match=r"src_sentences\[0\].*missing"):
-        sentalign(
+        align(
             [SourceObject(text="alpha", content="alpha", item_id=1)],
             ["alpha"],
             encoder=FakeEncoder(),
@@ -190,9 +190,9 @@ def test_custom_getter_extraction_error_is_wrapped_with_context():
 
 
 def test_empty_inputs_preserve_current_behavior():
-    both_empty = sentalign([], [], encoder=FakeEncoder())
-    source_empty = sentalign([], ["alpha"], encoder=FakeEncoder())
-    target_empty = sentalign(["alpha"], [], encoder=FakeEncoder())
+    both_empty = align([], [], encoder=FakeEncoder())
+    source_empty = align([], ["alpha"], encoder=FakeEncoder())
+    target_empty = align(["alpha"], [], encoder=FakeEncoder())
 
     assert both_empty.alignments == []
     assert source_empty.alignments[0].src_items == []
@@ -213,8 +213,8 @@ def test_multi_sentence_alignment_preserves_index_text_item_order(monkeypatch):
             }
         }
 
-    monkeypatch.setattr(sentalign_module, "vecalign", fake_vecalign)
-    result = sentalign(src, tgt, encoder=FakeEncoder(), alignment_max_size=4)
+    monkeypatch.setattr(align_module, "vecalign", fake_vecalign)
+    result = align(src, tgt, encoder=FakeEncoder(), alignment_max_size=4)
     combined = result.alignments[0]
 
     assert combined.src_indices == list(range(combined.src_indices[0], combined.src_indices[-1] + 1))
@@ -231,7 +231,7 @@ def test_input_objects_are_not_mutated():
     src_before = dict(src_item)
     tgt_before = BookSentence(**tgt_item.__dict__)
 
-    sentalign([src_item], [tgt_item], encoder=FakeEncoder())
+    align([src_item], [tgt_item], encoder=FakeEncoder())
 
     assert src_item == src_before
     assert tgt_item == tgt_before

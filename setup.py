@@ -4,8 +4,8 @@ import numpy as np
 
 extensions = [
     Extension(
-        "sentalign.dp_core",
-        sources=["src/sentalign/dp_core.pyx"],
+        "sentweave.dp_core",
+        sources=["src/sentweave/dp_core.pyx"],
         include_dirs=[np.get_include()],
     )
 ]

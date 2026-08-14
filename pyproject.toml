@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel", "numpy", "cython"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sentalign"
-version = "0.3.0"
+name = "sentweave"
+version = "0.3.1"
 description = "In-memory sentence alignment with Vecalign dynamic programming"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -15,6 +15,11 @@ authors = [
 dependencies = [
   "numpy",
 ]
+
+[project.urls]
+Homepage = "https://github.com/amajdalawi/sentweave"
+Repository = "https://github.com/amajdalawi/sentweave"
+Issues = "https://github.com/amajdalawi/sentweave/issues"
 
 [project.optional-dependencies]
 test = [
@@ -29,4 +34,4 @@ test-real = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-sentalign = ["*.pyx"]
+sentweave = ["*.pyx"]

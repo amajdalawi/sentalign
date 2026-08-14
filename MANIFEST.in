@@ -1,1 +1,1 @@
-recursive-include src/sentalign *.pyx
+recursive-include src/sentweave *.pyx

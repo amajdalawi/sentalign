@@ -1,7 +1,7 @@
 # tests/test_multilingual.py
 
 from sentence_transformers import SentenceTransformer
-from sentalign import sentalign
+from sentweave import align
 
 src = [
     "Hello world.",
@@ -19,7 +19,7 @@ encoder = SentenceTransformer(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
 
-result = sentalign(
+result = align(
     src,
     tgt,
     encoder=encoder,

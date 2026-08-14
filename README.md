@@ -1,13 +1,13 @@
-# sentalign
+# SentWeave
 
-`sentalign` is a small Python package for aligning sentences between two languages using multilingual sentence embeddings and VecAlign-style dynamic programming.
+`sentweave` is a small Python package for aligning sentences between two languages using multilingual sentence embeddings and VecAlign-style dynamic programming.
 
 It works fully in memory: pass two lists of sentences, get back aligned sentence blocks.
 
 ## Installation
 
 ```bash
-pip install sentalign
+pip install sentweave
 ```
 
 For real multilingual alignment, you also need an embedding model. For example:
@@ -20,7 +20,7 @@ pip install sentence-transformers
 
 ```python
 from sentence_transformers import SentenceTransformer
-from sentalign import sentalign
+from sentweave import align
 
 src = [
     "Hello world.",
@@ -38,7 +38,7 @@ encoder = SentenceTransformer(
     "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 )
 
-result = sentalign(
+result = align(
     src,
     tgt,
     encoder=encoder,
@@ -58,7 +58,7 @@ for alignment in result.alignments:
 
 ## Structured sentence inputs and metadata
 
-`sentalign` also accepts sentence objects that carry metadata. The alignment
+`sentweave` also accepts sentence objects that carry metadata. The alignment
 algorithm only uses extracted text for embedding and scoring; metadata is
 preserved on the original objects returned in each alignment block.
 
@@ -66,7 +66,7 @@ Dictionary-like inputs are supported automatically when they contain a `"text"`
 field:
 
 ```python
-from sentalign import sentalign
+from sentweave import align
 
 src = [
     {"text": "Where are you going?", "start": 12.4, "end": 14.1, "subtitle_id": 10},
@@ -78,7 +78,7 @@ tgt = [
     {"text": "Je rentre chez moi.", "start": 14.2, "end": 16.1, "subtitle_id": 21},
 ]
 
-result = sentalign(src, tgt, encoder=encoder)
+result = align(src, tgt, encoder=encoder)
 alignment = result.alignments[0]
 
 print(alignment.src_sentences)  # extracted strings
@@ -91,7 +91,7 @@ Objects with a `.text` attribute are also supported:
 
 ```python
 from dataclasses import dataclass
-from sentalign import sentalign
+from sentweave import align
 
 
 @dataclass
@@ -105,7 +105,7 @@ class BookSentence:
 src = [BookSentence("The man left the village.", 1, 1, 1)]
 tgt = [BookSentence("L'homme quitta le village.", 8, 3, 1)]
 
-result = sentalign(src, tgt, encoder=encoder)
+result = align(src, tgt, encoder=encoder)
 source_item = result.alignments[0].src_items[0]
 print(source_item.paragraph_id)
 ```
@@ -113,7 +113,7 @@ print(source_item.paragraph_id)
 For different object shapes, pass separate source and target extractors:
 
 ```python
-result = sentalign(
+result = align(
     src_objects,
     tgt_objects,
     encoder=encoder,
@@ -131,7 +131,7 @@ of being converted.
 
 ## Important: use a multilingual encoder
 
-`sentalign` does not create embeddings by itself. You must pass an encoder.
+`sentweave` does not create embeddings by itself. You must pass an encoder.
 
 For cross-language alignment, use a multilingual encoder such as:
 
@@ -146,7 +146,7 @@ Do not use a monolingual English-only model for English/French, English/Arabic, 
 ## API
 
 ```python
-sentalign(
+align(
     src_sentences,
     tgt_sentences,
     encoder,
@@ -159,7 +159,7 @@ sentalign(
 )
 ```
 
-Returns a `SentAlignResult`:
+Returns a `AlignmentResult`:
 
 ```python
 result.alignments
@@ -200,6 +200,11 @@ Build the package:
 python -m build
 twine check dist/*
 ```
+
+## Project history
+
+This project was previously published as `sentalign`. It was renamed to
+SentWeave to avoid confusion with the pre-existing academic SentAlign project.
 
 ## License
 

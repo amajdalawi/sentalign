@@ -21,7 +21,7 @@ from .dp_utils import (
 
 
 class EncoderProtocol(Protocol):
-    """Protocol for sentence encoders used by :func:`sentalign`."""
+    """Protocol for sentence encoders used by :func:`align`."""
 
     def encode(self, sentences: Sequence[str]) -> Union[np.ndarray, Sequence[Sequence[float]]]:
         """Return sentence embeddings where the first dimension is ``len(sentences)``."""
@@ -56,8 +56,8 @@ class SentenceAlignment(Generic[SrcT, TgtT]):
 
 
 @dataclass(frozen=True)
-class SentAlignResult(Generic[SrcT, TgtT]):
-    """Output of the :func:`sentalign` API."""
+class AlignmentResult(Generic[SrcT, TgtT]):
+    """Output of the :func:`align` API."""
 
     alignments: List[SentenceAlignment[SrcT, TgtT]]
     overall_score: float
@@ -154,7 +154,7 @@ def _alignment_quality(src_indices: Sequence[int], tgt_indices: Sequence[int], c
     return 1.0 - (clipped / 2.0)
 
 
-def sentalign(
+def align(
     src_sentences: Sequence[SrcT],
     tgt_sentences: Sequence[TgtT],
     encoder: EncoderType,
@@ -169,7 +169,7 @@ def sentalign(
     num_samps_for_norm: int = 100,
     search_buffer_size: int = 5,
     random_state: int = 42,
-) -> SentAlignResult[SrcT, TgtT]:
+) -> AlignmentResult[SrcT, TgtT]:
     """Align two sentence lists using Vecalign internals.
 
     Args:
@@ -189,7 +189,7 @@ def sentalign(
         random_state: Seed used for deterministic behavior.
 
     Returns:
-        ``SentAlignResult`` containing per-block alignments and an aggregate score.
+        ``AlignmentResult`` containing per-block alignments and an aggregate score.
         ``overall_score`` is a heuristic quality estimate in ``[0, 1]`` where higher
         is better.
     """
@@ -256,7 +256,7 @@ def sentalign(
     overall_score = float(np.average(quality_values, weights=quality_weights)) if quality_values else 0.0
     mean_cost = float(np.mean(alignment_scores)) if len(alignment_scores) else 0.0
 
-    return SentAlignResult(
+    return AlignmentResult(
         alignments=output_alignments,
         overall_score=overall_score,
         average_alignment_score=mean_cost,
